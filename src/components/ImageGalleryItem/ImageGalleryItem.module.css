@@ -1,0 +1,4 @@
+.gallery-item {
+  flex-basis: calc((100% - 150px) / 6);
+  height: auto;
+}

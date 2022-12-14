@@ -8,11 +8,12 @@ import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
 import { loadImagesFromPixabay } from './services/api';
 
-const IMAGES_PER_PAGE = 12;
+const IMAGES_PER_PAGE = 100;
 const INITIAL_STATE = {
   searchText: '',
   totalHits: 0,
   pageNr: 1,
+  maxPages: 1,
   images: [],
 };
 
@@ -27,6 +28,7 @@ export class App extends Component {
       pageNr,
       imagesPerPage
     );
+
     if (response.totalHits > 0) {
       let images = [];
       response.hits.forEach(image => {
@@ -36,9 +38,9 @@ export class App extends Component {
           largeImageURL: image.largeImageURL,
         });
       });
-      if (pageNr === 1) {
-        this.setState({ images: [] });
-      }
+
+      const maxPages = Math.ceil(response.totalHits / IMAGES_PER_PAGE);
+
       this.setState(prevState => {
         let newState = [];
         pageNr > 1
@@ -46,8 +48,10 @@ export class App extends Component {
           : (newState = [...images]);
         return {
           searchText,
-          images: newState,
+          totalHits: response.totalHits,
           pageNr,
+          maxPages,
+          images: newState,
         };
       });
     } else {
@@ -56,7 +60,7 @@ export class App extends Component {
   };
 
   render() {
-    const { searchText, images, pageNr, totalHits } = this.state;
+    const { searchText, images, pageNr, maxPages, totalHits } = this.state;
 
     return (
       <div
@@ -84,7 +88,14 @@ export class App extends Component {
               );
             })}
           </ImageGallery>
-          <Button />
+          {totalHits > 0 && pageNr < maxPages && (
+            <Button
+              pageNr={pageNr}
+              onClick={nextPage =>
+                this.searchImages(searchText, nextPage, IMAGES_PER_PAGE)
+              }
+            />
+          )}
         </div>
         <Loader />
         <Modal />

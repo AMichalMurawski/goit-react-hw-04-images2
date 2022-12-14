@@ -3,9 +3,10 @@ import css from './ImageGalleryItem.module.css';
 
 export class ImageGalleryItem extends Component {
   render() {
+    const { src, alt } = this.props;
     return (
       <li className={css['gallery-item']}>
-        <img src="" alt="" />
+        <img className={css['item-image']} src={src} alt={alt} />
       </li>
     );
   }

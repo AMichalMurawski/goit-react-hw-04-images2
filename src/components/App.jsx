@@ -9,12 +9,16 @@ import { Searchbar } from './Searchbar/Searchbar';
 import { loadImagesFromPixabay } from './services/api';
 
 const IMAGES_PER_PAGE = 12;
+const INITIAL_STATE = {
+  searchText: '',
+  totalHits: 0,
+  pageNr: 1,
+  images: [],
+};
 
 export class App extends Component {
   state = {
-    totalHits: 0,
-    pageNr: 1,
-    images: [],
+    ...INITIAL_STATE,
   };
 
   searchImages = async (searchText, pageNr, imagesPerPage) => {
@@ -23,31 +27,36 @@ export class App extends Component {
       pageNr,
       imagesPerPage
     );
-    let images = [];
-    response.hits.forEach(image => {
-      images.push({
-        id: image.id,
-        webformatURL: image.webformatURL,
-        largeImageURL: image.largeImageURL,
+    if (response.totalHits > 0) {
+      let images = [];
+      response.hits.forEach(image => {
+        images.push({
+          id: image.id,
+          webformatURL: image.webformatURL,
+          largeImageURL: image.largeImageURL,
+        });
       });
-    });
-    if (pageNr === 1) {
-      this.setState({ images: [] });
+      if (pageNr === 1) {
+        this.setState({ images: [] });
+      }
+      this.setState(prevState => {
+        let newState = [];
+        pageNr > 1
+          ? (newState = [...this.state.images, ...images])
+          : (newState = [...images]);
+        return {
+          searchText,
+          images: newState,
+          pageNr,
+        };
+      });
+    } else {
+      this.setState({ ...INITIAL_STATE });
     }
-    this.setState(prevState => {
-      let newState = [];
-      pageNr > 1
-        ? (newState = [...this.state.images, ...images])
-        : (newState = [...images]);
-      return {
-        images: newState,
-        pageNr,
-      };
-    });
   };
 
   render() {
-    const { images, pageNr, totalHits } = this.state;
+    const { searchText, images, pageNr, totalHits } = this.state;
 
     return (
       <div
@@ -66,7 +75,13 @@ export class App extends Component {
         <div>
           <ImageGallery>
             {images.map(image => {
-              <ImageGalleryItem />;
+              return (
+                <ImageGalleryItem
+                  key={image.id}
+                  src={image.webformatURL}
+                  alt={image.id}
+                />
+              );
             })}
           </ImageGallery>
           <Button />

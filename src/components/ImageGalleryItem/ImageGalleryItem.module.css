@@ -1,4 +1,6 @@
 .gallery-item {
+  position: relative;
   flex-basis: calc((100% - 150px) / 6);
-  height: auto;
+  height: calc((100vw - 150px) / 8);
+  overflow: hidden;
 }

@@ -7,7 +7,7 @@ import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
 import { getImagesFromPixabay } from './services/api';
 
-const IMAGES_PER_PAGE = 12;
+const IMAGES_PER_PAGE = 100;
 const INITIAL_STATE = {
   searchText: '',
   totalHits: 0,
@@ -40,6 +40,16 @@ export class App extends Component {
           largeImageURL: image.largeImageURL,
         });
       });
+
+      const prevImages = this.state.images
+      prevImages.forEach(prevImage => {
+        images.forEach((image, index, array) => {
+          if (prevImage.id === image.id) {
+            console.log(image.id, index)
+            array.splice(index,1)
+          }
+        })
+      })
 
       const maxPages = Math.ceil(response.totalHits / IMAGES_PER_PAGE);
 

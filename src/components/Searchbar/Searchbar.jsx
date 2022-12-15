@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types'
 import css from './Searchbar.module.css';
 
 const INITIAL_VALUE = {
@@ -44,4 +45,8 @@ export class Searchbar extends Component {
       </header>
     );
   }
+}
+
+Searchbar.propTypes = {
+  searchImages:PropTypes.func.isRequired
 }

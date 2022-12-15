@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types'
 import css from './Modal.module.css';
 
 const ESCAPE_KEY = 27
@@ -40,4 +41,9 @@ export class Modal extends Component {
       </div>
     );
   }
+}
+
+Modal.propTypes = {
+  src:PropTypes.string.isRequired,
+  modalClose:PropTypes.func.isRequired
 }

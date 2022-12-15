@@ -15,6 +15,7 @@ const INITIAL_STATE = {
   maxPages: 1,
   images: [],
   isLoading: false,
+  srcLarge: '',
 };
 
 export class App extends Component {
@@ -61,8 +62,17 @@ export class App extends Component {
     }
   };
 
+  modalOpen = (src) => {
+    this.setState({srcLarge: src})
+  }
+
+  modalClose = () => {
+    this.setState({srcLarge: ''})
+  }
+
+
   render() {
-    const { searchText, images, pageNr, maxPages, totalHits, isLoading } = this.state;
+    const { searchText, images, pageNr, maxPages, totalHits, isLoading, srcLarge } = this.state;
 
     return (
       <div
@@ -83,8 +93,10 @@ export class App extends Component {
             return (
               <ImageGalleryItem
                 key={image.id}
-                src={image.webformatURL}
+                srcWeb={image.webformatURL}
+                srcLarge={image.largeImageURL}
                 alt={image.id}
+                modalOpen={src => this.modalOpen(src)}
               />
             );
           })}
@@ -97,10 +109,7 @@ export class App extends Component {
               this.searchImages(searchText, nextPage, IMAGES_PER_PAGE)}
           />
         )}
-          
-          
-        
-        <Modal />
+        {srcLarge.length > 0 && (<Modal src={srcLarge} modalClose={this.modalClose} />)}
       </div>
     );
   }

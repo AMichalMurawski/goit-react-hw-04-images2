@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const PIXABAY_KEY = '31382977-48057b8c379edff4cc262b675';
 
-export const loadImagesFromPixabay = async (
+export const getImagesFromPixabay = async (
   searchText,
   pageNr,
   imagesPerPage

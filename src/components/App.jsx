@@ -1,4 +1,3 @@
-import { render } from '@testing-library/react';
 import { Component } from 'react';
 import { Button } from './Button/Button';
 import { ImageGallery } from './ImageGallery/ImageGallery';
@@ -6,15 +5,16 @@ import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
-import { loadImagesFromPixabay } from './services/api';
+import { getImagesFromPixabay } from './services/api';
 
-const IMAGES_PER_PAGE = 100;
+const IMAGES_PER_PAGE = 12;
 const INITIAL_STATE = {
   searchText: '',
   totalHits: 0,
   pageNr: 1,
   maxPages: 1,
   images: [],
+  isLoading: false,
 };
 
 export class App extends Component {
@@ -23,7 +23,8 @@ export class App extends Component {
   };
 
   searchImages = async (searchText, pageNr, imagesPerPage) => {
-    const response = await loadImagesFromPixabay(
+    this.setState({isLoading:true})
+    const response = await getImagesFromPixabay(
       searchText,
       pageNr,
       imagesPerPage
@@ -52,6 +53,7 @@ export class App extends Component {
           pageNr,
           maxPages,
           images: newState,
+          isLoading: false,
         };
       });
     } else {
@@ -60,7 +62,7 @@ export class App extends Component {
   };
 
   render() {
-    const { searchText, images, pageNr, maxPages, totalHits } = this.state;
+    const { searchText, images, pageNr, maxPages, totalHits, isLoading } = this.state;
 
     return (
       <div
@@ -76,28 +78,28 @@ export class App extends Component {
         <Searchbar
           searchImages={text => this.searchImages(text, 1, IMAGES_PER_PAGE)}
         />
-        <div>
-          <ImageGallery>
-            {images.map(image => {
-              return (
-                <ImageGalleryItem
-                  key={image.id}
-                  src={image.webformatURL}
-                  alt={image.id}
-                />
-              );
-            })}
-          </ImageGallery>
-          {totalHits > 0 && pageNr < maxPages && (
-            <Button
-              pageNr={pageNr}
-              onClick={nextPage =>
-                this.searchImages(searchText, nextPage, IMAGES_PER_PAGE)
-              }
-            />
-          )}
-        </div>
-        <Loader />
+        <ImageGallery>
+          {images.map(image => {
+            return (
+              <ImageGalleryItem
+                key={image.id}
+                src={image.webformatURL}
+                alt={image.id}
+              />
+            );
+          })}
+        </ImageGallery>
+        {isLoading === true && <Loader />}
+        {totalHits > 0 && pageNr < maxPages && (
+          <Button
+            pageNr={pageNr}
+            onClick={nextPage =>
+              this.searchImages(searchText, nextPage, IMAGES_PER_PAGE)}
+          />
+        )}
+          
+          
+        
         <Modal />
       </div>
     );

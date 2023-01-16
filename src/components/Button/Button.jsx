@@ -4,8 +4,8 @@ import css from './Button.module.css';
 
 export class Button extends Component {
   handleClick = () => {
-    const { pageNr } = this.props;
-    const nextPage = pageNr + 1;
+    const { page } = this.props;
+    const nextPage = page + 1;
     this.props.onClick(nextPage);
   };
 
@@ -19,6 +19,6 @@ export class Button extends Component {
 }
 
 Button.propTypes = {
-  pageNr: PropTypes.number.isRequired,
+  page: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,
 };

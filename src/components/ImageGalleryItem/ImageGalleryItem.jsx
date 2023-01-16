@@ -27,4 +27,5 @@ ImageGalleryItem.propTypes = {
   srcLarge: PropTypes.string.isRequired,
   srcWeb: PropTypes.string.isRequired,
   alt: PropTypes.string.isRequired,
+  modalOpen: PropTypes.func.isRequired,
 };

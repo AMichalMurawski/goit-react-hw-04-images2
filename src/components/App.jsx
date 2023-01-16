@@ -5,13 +5,12 @@ import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
-import { getImagesFromPixabay } from './services/api';
+import { getImagesFromPixabay } from '../services/api';
 
-const IMAGES_PER_PAGE = 12;
 const INITIAL_STATE = {
   searchText: '',
   totalHits: 0,
-  pageNr: 1,
+  page: 1,
   maxPages: 1,
   images: [],
   isLoading: false,
@@ -23,12 +22,11 @@ export class App extends Component {
     ...INITIAL_STATE,
   };
 
-  searchImages = async (searchText, pageNr, imagesPerPage) => {
+  searchImages = async (searchText, page) => {
     this.setState({ isLoading: true });
     const response = await getImagesFromPixabay(
       searchText,
-      pageNr,
-      imagesPerPage
+      page
     );
 
     if (response.totalHits > 0) {
@@ -45,23 +43,22 @@ export class App extends Component {
       prevImages.forEach(prevImage => {
         images.forEach((image, index, array) => {
           if (prevImage.id === image.id) {
-            console.log(image.id, index);
             array.splice(index, 1);
           }
         });
       });
 
-      const maxPages = Math.ceil(response.totalHits / IMAGES_PER_PAGE);
+      const maxPages = Math.ceil(response.totalHits / response.hits.length);
 
       this.setState(prevState => {
         let newState = [];
-        pageNr > 1
+        page > 1
           ? (newState = [...this.state.images, ...images])
           : (newState = [...images]);
         return {
           searchText,
           totalHits: response.totalHits,
-          pageNr,
+          page,
           maxPages,
           images: newState,
           isLoading: false,
@@ -84,7 +81,7 @@ export class App extends Component {
     const {
       searchText,
       images,
-      pageNr,
+      page,
       maxPages,
       totalHits,
       isLoading,
@@ -104,7 +101,7 @@ export class App extends Component {
         }}
       >
         <Searchbar
-          searchImages={text => this.searchImages(text, 1, IMAGES_PER_PAGE)}
+          searchImages={text => this.searchImages(text, 1)}
         />
         <ImageGallery>
           {images.map(image => {
@@ -113,18 +110,18 @@ export class App extends Component {
                 key={image.id}
                 srcWeb={image.webformatURL}
                 srcLarge={image.largeImageURL}
-                alt={image.id}
+                alt={image.id.toString()}
                 modalOpen={src => this.modalOpen(src)}
               />
             );
           })}
         </ImageGallery>
         {isLoading === true && <Loader />}
-        {totalHits > 0 && pageNr < maxPages && (
+        {totalHits > 0 && page < maxPages && (
           <Button
-            pageNr={pageNr}
+            page={page}
             onClick={nextPage =>
-              this.searchImages(searchText, nextPage, IMAGES_PER_PAGE)
+              this.searchImages(searchText, nextPage)
             }
           />
         )}

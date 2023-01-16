@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 const PIXABAY_KEY = '31382977-48057b8c379edff4cc262b675';
+const IMAGES_PER_PAGE = 12;
 
 export const getImagesFromPixabay = async (
   searchText,
-  pageNr,
-  imagesPerPage
+  pageNr
 ) => {
   const response = await axios({
     method: 'get',
@@ -16,7 +16,7 @@ export const getImagesFromPixabay = async (
       key: PIXABAY_KEY,
       image_type: 'photo',
       orientation: 'horizontal',
-      per_page: imagesPerPage,
+      per_page: IMAGES_PER_PAGE,
     },
   })
     .then(response => {

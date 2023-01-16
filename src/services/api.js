@@ -3,10 +3,7 @@ import axios from 'axios';
 const PIXABAY_KEY = '31382977-48057b8c379edff4cc262b675';
 const IMAGES_PER_PAGE = 12;
 
-export const getImagesFromPixabay = async (
-  searchText,
-  pageNr
-) => {
+export const getImagesFromPixabay = async (searchText, pageNr) => {
   const response = await axios({
     method: 'get',
     url: 'https://pixabay.com/api/',

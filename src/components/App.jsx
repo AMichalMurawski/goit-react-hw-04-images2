@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import { Button } from './Button/Button';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
@@ -24,11 +23,7 @@ export class App extends Component {
 
   searchImages = async (searchText, page) => {
     this.setState({ isLoading: true });
-    const response = await getImagesFromPixabay(
-      searchText,
-      page
-    );
-
+    const response = await getImagesFromPixabay(searchText, page);
     if (response.totalHits > 0) {
       let images = [];
       response.hits.forEach(image => {
@@ -38,22 +33,24 @@ export class App extends Component {
           largeImageURL: image.largeImageURL,
         });
       });
-
       const prevImages = this.state.images;
-      prevImages.forEach(prevImage => {
-        images.forEach((image, index, array) => {
-          if (prevImage.id === image.id) {
-            array.splice(index, 1);
-          }
+      if (page !== 1) {
+        prevImages.forEach(prevImage => {
+          images.forEach((image, index, array) => {
+            if (prevImage.id === image.id) {
+              array.splice(index, 1);
+            }
+          });
         });
-      });
+      }
 
       const maxPages = Math.ceil(response.totalHits / response.hits.length);
 
       this.setState(prevState => {
         let newState = [];
+        console.log(prevState);
         page > 1
-          ? (newState = [...this.state.images, ...images])
+          ? (newState = [...prevState.images, ...images])
           : (newState = [...images]);
         return {
           searchText,
@@ -88,6 +85,8 @@ export class App extends Component {
       srcLarge,
     } = this.state;
 
+    console.log(page, searchText);
+
     return (
       <div
         style={{
@@ -100,29 +99,13 @@ export class App extends Component {
           color: '#010101',
         }}
       >
-        <Searchbar
-          searchImages={text => this.searchImages(text, 1)}
-        />
-        <ImageGallery>
-          {images.map(image => {
-            return (
-              <ImageGalleryItem
-                key={image.id}
-                srcWeb={image.webformatURL}
-                srcLarge={image.largeImageURL}
-                alt={image.id.toString()}
-                modalOpen={src => this.modalOpen(src)}
-              />
-            );
-          })}
-        </ImageGallery>
+        <Searchbar searchImages={text => this.searchImages(text, 1)} />
+        <ImageGallery images={images} modalOpen={this.modalOpen} />
         {isLoading === true && <Loader />}
         {totalHits > 0 && page < maxPages && (
           <Button
             page={page}
-            onClick={nextPage =>
-              this.searchImages(searchText, nextPage)
-            }
+            onClick={nextPage => this.searchImages(searchText, nextPage)}
           />
         )}
         {srcLarge.length > 0 && (
